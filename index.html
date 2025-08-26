@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whale</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Tela Inicial -->
+        <div id="home-screen" class="screen">
+            <h1>Whale</h1>
+            <p>Selecione o treino que deseja realizar:</p>
+            
+            <div class="training-option" data-training="A">
+                <h2>Treino A</h2>
+                <p>Escalas e Arpejos - 25 minutos</p>
+            </div>
+            
+            <div class="training-option" data-training="B">
+                <h2>Treino B</h2>
+                <p>Acordes e Progressões - 20 minutos</p>
+            </div>
+            
+            <div class="training-option" data-training="C">
+                <h2>Treino C</h2>
+                <p>Improvisação e Técnica - 30 minutos</p>
+            </div>
+        </div>
+        
+        <!-- Tela de Lista de Exercícios -->
+        <div id="exercise-list-screen" class="screen hidden">
+            <h1 id="training-title">Treino A</h1>
+            <p>Este treino contém os seguintes exercícios:</p>
+            
+            <div id="exercise-list" class="exercise-list">
+                <!-- Lista de exercícios será preenchida via JavaScript -->
+            </div>
+            
+            <button id="start-training-btn" class="btn">Iniciar Treino</button>
+        </div>
+        
+        <!-- Tela de Exercício -->
+        <div id="exercise-screen" class="screen hidden">
+            <h1 id="current-exercise-name">Nome do Exercício</h1>
+            
+            <div class="exercise-info">
+                <p id="exercise-description">Descrição do exercício...</p>
+                <p>Tempo: <span id="exercise-duration">00:00</span></p>
+            </div>
+            
+            <div class="progress-bar">
+                <div id="exercise-progress" class="progress"></div>
+            </div>
+            
+            <div id="countdown" class="countdown hidden">3</div>
+            
+            <div id="timer" class="timer">00:00</div>
+            
+            <button id="start-exercise-btn" class="btn btn-start">Iniciar</button>
+            <button id="next-exercise-btn" class="btn hidden">Avançar</button>
+        </div>
+        
+        <!-- Tela de Finalização -->
+        <div id="finish-screen" class="screen hidden">
+            <h1>Treino Concluído!</h1>
+            <p>Parabéns por completar seu treino de guitarra!</p>
+            <button id="back-to-home-btn" class="btn">Voltar ao Início</button>
+        </div>
+    </div>
+
+    <audio id="sound-alarm" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
