@@ -128,6 +128,75 @@ p {
     border-bottom: 1px solid #ddd;
 }
 
+.metronome-controls {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.metronome-settings {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.metronome-settings label {
+    margin: 5px 10px;
+}
+
+.metronome-settings input,
+.metronome-settings select {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.btn-metronome {
+    background-color: #9b59b6;
+}
+
+.btn-metronome:hover {
+    background-color: #8e44ad;
+}
+
+.metronome-beat-indicator {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.beat-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #ddd;
+    margin: 0 8px;
+    transition: all 0.1s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: white;
+    font-size: 12px;
+}
+
+.beat-dot.active {
+    background-color: #9b59b6;
+    transform: scale(1.2);
+}
+
+.beat-dot.strong {
+    background-color: #e74c3c;
+    transform: scale(1.4);
+}
+
+.beat-dot.strong.active {
+    background-color: #e74c3c;
+    transform: scale(1.4);
+}
+
 .hidden {
     display: none;
 }

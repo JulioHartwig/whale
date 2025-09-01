@@ -1,4 +1,3 @@
-// Dados dos treinos
 const trainingData = {
     A: {
         name: "Treino A - Escalas e Arpejos",
@@ -6,53 +5,55 @@ const trainingData = {
             {
                 name: "Escala Pentatônica",
                 description: "Pratique a escala pentatônica em todas as posições",
-                duration: 300 // 5 minutos em segundos
+                duration: 300 
             },
             {
                 name: "Arpejos Maiores",
                 description: "Pratique arpejos maiores em diferentes tonalidades",
-                duration: 300 // 5 minutos
+                duration: 300 
             },
             {
                 name: "Escala Maior",
                 description: "Pratique a escala maior em todas as cordas",
-                duration: 420 // 7 minutos
+                duration: 420 
             },
             {
                 name: "Arpejos Menores",
                 description: "Pratique arpejos menores em diferentes tonalidades",
-                duration: 360 // 6 minutos
+                duration: 360 
             },
             {
                 name: "Escalas em Terças",
                 description: "Pratique escalas em intervalos de terças",
-                duration: 300 // 5 minutos
+                duration: 300 
             }
         ]
     },
     B: {
         name: "Treino B - Acordes e Progressões",
         exercises: [
+
             {
                 name: "Acordes Abertos",
                 description: "Pratique transições entre acordes abertos",
-                duration: 300 // 5 minutos
+                duration: 300 
             },
             {
                 name: "Acordes com Pestana",
                 description: "Pratique acordes com pestana em diferentes posições",
-                duration: 420 // 7 minutos
+                duration: 420 
             },
             {
                 name: "Progressão I-IV-V",
                 description: "Pratique a progressão clássica I-IV-V",
-                duration: 360 // 6 minutos
+                duration: 360 
             },
+            
             {
                 name: "Progressão ii-V-I",
                 description: "Pratique a progressão jazzística ii-V-I",
-                duration: 420 // 7 minutos
-            }
+                duration: 420 
+            },
         ]
     },
     C: {
@@ -61,33 +62,33 @@ const trainingData = {
             {
                 name: "Bending e Vibrato",
                 description: "Pratique técnicas de bending e vibrato",
-                duration: 300 // 5 minutos
+                duration: 300 
             },
             {
                 name: "Hammer-on e Pull-off",
                 description: "Pratique ligados ascendentes e descendentes",
-                duration: 300 // 5 minutos
+                duration: 300 
             },
             {
                 name: "Sweep Picking",
                 description: "Pratique a técnica de sweep picking em arpejos",
-                duration: 420 // 7 minutos
+                duration: 420 
             },
             {
                 name: "Improvisação em Bluess",
                 description: "Improviso sobre progressão de 12 compassos de blues",
-                duration: 480 // 8 minutos
+                duration: 480 
             },
             {
                 name: "Improvisação Modal",
                 description: "Improviso utilizando modos gregos",
-                duration: 420 // 7 minutos
+                duration: 420 
             }
         ]
     }
 };
 
-// Elementos da DOM
+
 const homeScreen = document.getElementById('home-screen');
 const exerciseListScreen = document.getElementById('exercise-list-screen');
 const exerciseScreen = document.getElementById('exercise-screen');
@@ -111,13 +112,13 @@ const soundAlarm = document.getElementById('sound-alarm');
 
 const trainingOptions = document.querySelectorAll('.training-option');
 
-// Variáveis de estado
+
 let currentTraining = null;
 let currentExerciseIndex = 0;
 let timerInterval = null;
 let countdownInterval = null;
 
-// Event Listeners
+
 trainingOptions.forEach(option => {
     option.addEventListener('click', () => {
         const trainingType = option.getAttribute('data-training');
@@ -130,12 +131,12 @@ startExerciseBtn.addEventListener('click', startExercise);
 nextExerciseBtn.addEventListener('click', nextExercise);
 backToHomeBtn.addEventListener('click', backToHome);
 
-// Funções
+
 function selectTraining(trainingType) {
     currentTraining = trainingData[trainingType];
     trainingTitle.textContent = currentTraining.name;
     
-    // Preencher lista de exercícios
+
     exerciseList.innerHTML = '';
     currentTraining.exercises.forEach((exercise, index) => {
         const exerciseItem = document.createElement('div');
@@ -147,7 +148,7 @@ function selectTraining(trainingType) {
         exerciseList.appendChild(exerciseItem);
     });
     
-    // Mostrar tela de lista de exercícios
+
     homeScreen.classList.add('hidden');
     exerciseListScreen.classList.remove('hidden');
 }
@@ -164,14 +165,14 @@ function showExercise() {
     exerciseDescription.textContent = exercise.description;
     exerciseDuration.textContent = formatTime(exercise.duration);
     
-    // Resetar elementos
+
     timerElement.textContent = formatTime(exercise.duration);
     exerciseProgress.style.width = '0%';
     countdownElement.classList.add('hidden');
     startExerciseBtn.classList.remove('hidden');
     nextExerciseBtn.classList.add('hidden');
     
-    // Mostrar tela de exercício
+
     exerciseListScreen.classList.add('hidden');
     exerciseScreen.classList.remove('hidden');
 }
@@ -180,14 +181,14 @@ function startExercise() {
     const exercise = currentTraining.exercises[currentExerciseIndex];
     let countdown = 3;
     
-    // Esconder botão iniciar
+
     startExerciseBtn.classList.add('hidden');
     
-    // Mostrar countdown
+
     countdownElement.textContent = countdown;
     countdownElement.classList.remove('hidden');
     
-    // Iniciar countdown
+
     countdownInterval = setInterval(() => {
         countdown--;
         countdownElement.textContent = countdown;
@@ -209,10 +210,10 @@ function startTimer(duration) {
     timerInterval = setInterval(() => {
         timeLeft--;
         
-        // Atualizar timer
+
         timerElement.textContent = formatTime(timeLeft);
         
-        // Atualizar barra de progresso
+
         const progressPercentage = 100 - (timeLeft / totalDuration * 100);
         exerciseProgress.style.width = `${progressPercentage}%`;
         
@@ -230,7 +231,7 @@ function nextExercise() {
     if (currentExerciseIndex < currentTraining.exercises.length) {
         showExercise();
     } else {
-        // Treino finalizado
+
         exerciseScreen.classList.add('hidden');
         finishScreen.classList.remove('hidden');
     }
@@ -240,7 +241,7 @@ function backToHome() {
     finishScreen.classList.add('hidden');
     homeScreen.classList.remove('hidden');
     
-    // Limpar estado
+
     currentTraining = null;
     currentExerciseIndex = 0;
 }
@@ -249,4 +250,157 @@ function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+
+let metronomeInterval = null;
+let currentBeat = 0;
+let isMetronomeActive = false;
+
+
+const metronomeControls = document.querySelector('.metronome-controls');
+const metronomeBpmInput = document.getElementById('metronome-bpm');
+const metronomeTimeSignatureSelect = document.getElementById('metronome-time-signature');
+const metronomeStartBtn = document.getElementById('metronome-start');
+const metronomeStopBtn = document.getElementById('metronome-stop');
+const metronomeSound = document.getElementById('metronome-sound');
+const metronomeFirstBeatSound = document.getElementById('metronome-sound-first');
+const beatIndicator = document.createElement('div');
+beatIndicator.className = 'metronome-beat-indicator';
+
+
+metronomeControls.appendChild(beatIndicator);
+
+
+metronomeStartBtn.addEventListener('click', startMetronome);
+metronomeStopBtn.addEventListener('click', stopMetronome);
+
+
+function createBeatIndicator(beats) {
+    beatIndicator.innerHTML = '';
+    for (let i = 0; i < beats; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'beat-dot';
+        dot.textContent = i + 1;
+        
+//        if (i === 0) {
+//        dot.classList.add('strong');
+//        }
+        
+        beatIndicator.appendChild(dot);
+    }
+}
+
+function updateBeatIndicator(beat) {
+    const dots = beatIndicator.querySelectorAll('.beat-dot');
+    dots.forEach((dot, index) => {
+
+        dot.classList.remove('active');
+        
+        if (index === beat) {
+            dot.classList.add('active');
+        }
+    });
+}
+
+function startMetronome() {
+    if (isMetronomeActive) return;
+    
+    const bpm = parseInt(metronomeBpmInput.value) || 120;
+    const timeSignature = parseInt(metronomeTimeSignatureSelect.value) || 4;
+    const interval = 60000 / bpm; 
+    
+    isMetronomeActive = true;
+    currentBeat = 0;
+    
+    createBeatIndicator(timeSignature);
+    updateBeatIndicator(currentBeat);
+    
+    metronomeFirstBeatSound.currentTime = 0;
+    metronomeFirstBeatSound.play();
+    
+    metronomeInterval = setInterval(() => {
+        currentBeat = (currentBeat + 1) % timeSignature;
+        updateBeatIndicator(currentBeat);
+        
+        if (currentBeat === 0) {
+            metronomeFirstBeatSound.currentTime = 0;
+            metronomeFirstBeatSound.play();
+        } else {
+            metronomeSound.currentTime = 0;
+            metronomeSound.play();
+        }
+    }, interval);
+    
+    metronomeStartBtn.classList.add('hidden');
+    metronomeStopBtn.classList.remove('hidden');
+}
+
+function stopMetronome() {
+    if (!isMetronomeActive) return;
+    
+    clearInterval(metronomeInterval);
+    isMetronomeActive = false;
+    
+    metronomeStartBtn.classList.remove('hidden');
+    metronomeStopBtn.classList.add('hidden');
+    
+    const dots = beatIndicator.querySelectorAll('.beat-dot');
+    dots.forEach(dot => dot.classList.remove('active'));
+}
+
+function showExercise() {
+    const exercise = currentTraining.exercises[currentExerciseIndex];
+    
+    currentExerciseName.textContent = exercise.name;
+    exerciseDescription.textContent = exercise.description;
+    exerciseDuration.textContent = formatTime(exercise.duration);
+    
+    timerElement.textContent = formatTime(exercise.duration);
+    exerciseProgress.style.width = '0%';
+    countdownElement.classList.add('hidden');
+    startExerciseBtn.classList.remove('hidden');
+    nextExerciseBtn.classList.add('hidden');
+    
+    const showMetronome = exercise.name.includes('Escala') || 
+                         exercise.name.includes('Arpejo') || 
+                         exercise.name.includes('Progressão');
+    
+    if (showMetronome) {
+        metronomeControls.classList.remove('hidden');
+        stopMetronome();
+    } else {
+        metronomeControls.classList.add('hidden');
+        stopMetronome();
+    }
+    
+    exerciseListScreen.classList.add('hidden');
+    exerciseScreen.classList.remove('hidden');
+}
+
+function nextExercise() {
+    stopMetronome();
+    
+    currentExerciseIndex++;
+    
+    if (currentExerciseIndex < currentTraining.exercises.length) {
+        showExercise();
+    } else {
+
+        exerciseScreen.classList.add('hidden');
+        finishScreen.classList.remove('hidden');
+    }
+}
+
+
+function backToHome() {
+
+    stopMetronome();
+    
+    finishScreen.classList.add('hidden');
+    homeScreen.classList.remove('hidden');
+    
+
+    currentTraining = null;
+    currentExerciseIndex = 0;
 }
