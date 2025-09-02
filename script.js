@@ -16,27 +16,32 @@ const trainingData = {
             {
                 name: "Escala Pentatônica",
                 description: "Pratique a escala pentatônica em todas as posições",
-                duration: 300 
+                duration: 300,
+                useMetronome: true 
             },
             {
                 name: "Arpejos Maiores",
                 description: "Pratique arpejos maiores em diferentes tonalidades",
-                duration: 300 
+                duration: 300,
+                useMetronome: true 
             },
             {
                 name: "Escala Maior",
                 description: "Pratique a escala maior em todas as cordas",
-                duration: 420 
+                duration: 420,
+                useMetronome: true 
             },
             {
                 name: "Arpejos Menores",
                 description: "Pratique arpejos menores em diferentes tonalidades",
-                duration: 360 
+                duration: 360,
+                useMetronome: true 
             },
             {
                 name: "Escalas em Terças",
                 description: "Pratique escalas em intervalos de terças",
-                duration: 300 
+                duration: 300,
+                useMetronome: true 
             }
         ]
     },
@@ -46,22 +51,26 @@ const trainingData = {
             {
                 name: "Acordes Abertos",
                 description: "Pratique transições entre acordes abertos",
-                duration: 300 
+                duration: 300,
+                useMetronome: true 
             },
             {
                 name: "Acordes com Pestana",
                 description: "Pratique acordes com pestana em diferentes posições",
-                duration: 420 
+                duration: 420,
+                useMetronome: true 
             },
             {
                 name: "Progressão I-IV-V",
                 description: "Pratique a progressão clássica I-IV-V",
-                duration: 360 
+                duration: 360,
+                useMetronome: true 
             },
             {
                 name: "Progressão ii-V-I",
                 description: "Pratique a progressão jazzística ii-V-I",
-                duration: 420 
+                duration: 420,
+                useMetronome: true 
             }
         ]
     },
@@ -71,27 +80,32 @@ const trainingData = {
             {
                 name: "Bending e Vibrato",
                 description: "Pratique técnicas de bending e vibrato",
-                duration: 300 
+                duration: 300,
+                useMetronome: true 
             },
             {
                 name: "Hammer-on e Pull-off",
                 description: "Pratique ligados ascendentes e descendentes",
-                duration: 300 
+                duration: 300,
+                useMetronome: true 
             },
             {
                 name: "Sweep Picking",
                 description: "Pratique a técnica de sweep picking em arpejos",
-                duration: 420 
+                duration: 420,
+                useMetronome: true 
             },
             {
                 name: "Improvisação em Blues",
                 description: "Improviso sobre progressão de 12 compassos de blues",
-                duration: 480 
+                duration: 480,
+                useMetronome: true 
             },
             {
                 name: "Improvisação Modal",
                 description: "Improviso utilizando modos gregos",
-                duration: 420 
+                duration: 420,
+                useMetronome: true 
             }
         ]
     }
@@ -233,6 +247,16 @@ function showExercise() {
     // Mostrar tela de exercício
     exerciseListScreen.classList.add('hidden');
     exerciseScreen.classList.remove('hidden');
+
+    // Mostrar controles do metrônomo baseado na propriedade useMetronome
+if (exercise.useMetronome) {
+    metronomeControls.classList.remove('hidden');
+    stopMetronome();
+} else {
+    metronomeControls.classList.add('hidden');
+    stopMetronome();
+}
+
 }
 
 function startExercise() {
