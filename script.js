@@ -9,6 +9,12 @@ let isTimerPaused = false;
 let timeLeft = 0;
 let totalDuration = 0;
 
+// Variáveis da Web Audio API
+let audioContext;
+let metronomeSoundBuffer;
+let metronomeFirstBeatSoundBuffer;
+let isAudioInitialized = false;
+
 const trainingData = {
     A: {
         name: "Treino A - Escalas e Arpejos",
@@ -143,8 +149,6 @@ const metronomeBpmInput = document.getElementById('metronome-bpm');
 const metronomeTimeSignatureSelect = document.getElementById('metronome-time-signature');
 const metronomeStartBtn = document.getElementById('metronome-start');
 const metronomeStopBtn = document.getElementById('metronome-stop');
-const metronomeSound = document.getElementById('metronome-sound');
-const metronomeFirstBeatSound = document.getElementById('metronome-sound-first');
 const beatIndicator = document.createElement('div');
 beatIndicator.className = 'metronome-beat-indicator';
 
@@ -168,8 +172,12 @@ startTrainingBtn.addEventListener('click', startTraining);
 startExerciseBtn.addEventListener('click', startExercise);
 nextExerciseBtn.addEventListener('click', nextExercise);
 
-// Event listeners do metrônomo
-metronomeStartBtn.addEventListener('click', startMetronome);
+// Event listeners do metrônomo (modificado para Web Audio API)
+metronomeStartBtn.addEventListener('click', function() {
+    initAudio();
+    startMetronome();
+});
+
 metronomeStopBtn.addEventListener('click', stopMetronome);
 
 // Event listeners dos novos botões
@@ -180,6 +188,57 @@ restartExerciseBtn.addEventListener('click', restartExercise);
 backToHomeBtn1.addEventListener('click', backToHome);
 backToHomeBtn2.addEventListener('click', backToHome);
 backToHomeBtn3.addEventListener('click', backToHome);
+
+// Funções da Web Audio API
+function initAudio() {
+    if (isAudioInitialized) return;
+    
+    // Cria o contexto de áudio
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Carrega os sons do metrônomo
+    loadSound('./assets/audios/metronome-sound-up.mp3', function(buffer) {
+        metronomeSoundBuffer = buffer;
+    });
+    
+    loadSound('./assets/audios/metronome-sound-down.mp3', function(buffer) {
+        metronomeFirstBeatSoundBuffer = buffer;
+    });
+    
+    isAudioInitialized = true;
+    
+    // Resumo o contexto se estiver suspenso (necessário em alguns browsers)
+    if (audioContext.state === 'suspended') {
+        audioContext.resume();
+    }
+}
+
+function loadSound(url, callback) {
+    const request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+    
+    request.onload = function() {
+        audioContext.decodeAudioData(request.response, callback, function(err) {
+            console.error('Erro ao decodificar áudio:', err);
+        });
+    };
+    
+    request.onerror = function() {
+        console.error('Erro ao carregar áudio:', url);
+    };
+    
+    request.send();
+}
+
+function playSound(buffer) {
+    if (!audioContext || !buffer) return;
+    
+    const source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioContext.destination);
+    source.start(0);
+}
 
 // Funções
 function selectTraining(trainingType) {
@@ -223,21 +282,16 @@ function showExercise() {
     nextExerciseBtn.classList.add('hidden');
     pauseExerciseBtn.classList.add('hidden');
     resumeExerciseBtn.classList.add('hidden');
-    restartExerciseBtn.classList.remove('hidden'); // Mostrar botão de reiniciar desde o início
+    restartExerciseBtn.classList.remove('hidden');
     
     // Resetar estado do timer
     isTimerPaused = false;
     timeLeft = exercise.duration;
     totalDuration = exercise.duration;
 
-    // Mostrar controles do metrônomo (apenas para alguns exercícios)
-    const showMetronome = exercise.name.includes('Escala') || 
-                         exercise.name.includes('Arpejo') || 
-                         exercise.name.includes('Progressão');
-    
-    if (showMetronome) {
+    // Mostrar controles do metrônomo baseado na propriedade useMetronome
+    if (exercise.useMetronome) {
         metronomeControls.classList.remove('hidden');
-        // Parar metrônomo se estiver ativo de um exercício anterior
         stopMetronome();
     } else {
         metronomeControls.classList.add('hidden');
@@ -247,16 +301,6 @@ function showExercise() {
     // Mostrar tela de exercício
     exerciseListScreen.classList.add('hidden');
     exerciseScreen.classList.remove('hidden');
-
-    // Mostrar controles do metrônomo baseado na propriedade useMetronome
-if (exercise.useMetronome) {
-    metronomeControls.classList.remove('hidden');
-    stopMetronome();
-} else {
-    metronomeControls.classList.add('hidden');
-    stopMetronome();
-}
-
 }
 
 function startExercise() {
@@ -265,7 +309,6 @@ function startExercise() {
     
     // Esconder botões desnecessários
     startExerciseBtn.classList.add('hidden');
-    // Não esconder o botão de reiniciar - manter visível
     
     // Mostrar countdown
     countdownElement.textContent = countdown;
@@ -285,7 +328,7 @@ function startExercise() {
 }
 
 function startTimer() {
-    // Limpar qualquer intervalo anterior (importante para evitar múltiplos intervalos)
+    // Limpar qualquer intervalo anterior
     clearInterval(timerInterval);
     
     timerInterval = setInterval(() => {
@@ -304,7 +347,6 @@ function startTimer() {
                 soundAlarm.play();
                 nextExerciseBtn.classList.remove('hidden');
                 pauseExerciseBtn.classList.add('hidden');
-                // Manter o botão de reiniciar visível
             }
         }
     }, 1000);
@@ -390,9 +432,10 @@ function startMetronome() {
     createBeatIndicator(timeSignature);
     updateBeatIndicator(currentBeat);
     
-    // Tocar a primeira batida (som diferente)
-    metronomeFirstBeatSound.currentTime = 0;
-    metronomeFirstBeatSound.play();
+    // Tocar a primeira batida (som diferente) usando Web Audio API
+    if (metronomeFirstBeatSoundBuffer) {
+        playSound(metronomeFirstBeatSoundBuffer);
+    }
     
     metronomeInterval = setInterval(() => {
         currentBeat = (currentBeat + 1) % timeSignature;
@@ -400,11 +443,13 @@ function startMetronome() {
         
         // Tocar som diferente para a primeira batida do compasso
         if (currentBeat === 0) {
-            metronomeFirstBeatSound.currentTime = 0;
-            metronomeFirstBeatSound.play();
+            if (metronomeFirstBeatSoundBuffer) {
+                playSound(metronomeFirstBeatSoundBuffer);
+            }
         } else {
-            metronomeSound.currentTime = 0;
-            metronomeSound.play();
+            if (metronomeSoundBuffer) {
+                playSound(metronomeSoundBuffer);
+            }
         }
     }, interval);
     
@@ -421,11 +466,10 @@ function stopMetronome() {
     metronomeStartBtn.classList.remove('hidden');
     metronomeStopBtn.classList.add('hidden');
     
-    // Resetar indicador de batidas (remover active mas manter strong na primeira)
+    // Resetar indicador de batidas
     const dots = beatIndicator.querySelectorAll('.beat-dot');
     dots.forEach((dot, index) => {
         dot.classList.remove('active');
-        // Garantir que a primeira batida mantenha a classe strong
         if (index === 0) {
             dot.classList.add('strong');
         }
@@ -467,5 +511,4 @@ function restartExercise() {
     nextExerciseBtn.classList.add('hidden');
     pauseExerciseBtn.classList.add('hidden');
     resumeExerciseBtn.classList.add('hidden');
-    // Manter o botão de reiniciar visível
-}
+}   
