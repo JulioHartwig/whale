@@ -152,7 +152,6 @@ const metronomeStopBtn = document.getElementById('metronome-stop');
 const beatIndicator = document.createElement('div');
 beatIndicator.className = 'metronome-beat-indicator';
 
-// Adicione o indicador de batidas aos controles do metrônomo
 metronomeControls.appendChild(beatIndicator);
 
 // Variáveis do metrônomo
@@ -172,7 +171,7 @@ startTrainingBtn.addEventListener('click', startTraining);
 startExerciseBtn.addEventListener('click', startExercise);
 nextExerciseBtn.addEventListener('click', nextExercise);
 
-// Event listeners do metrônomo (modificado para Web Audio API)
+// Event listeners do metrônomo
 metronomeStartBtn.addEventListener('click', function() {
     initAudio();
     startMetronome();
@@ -180,7 +179,6 @@ metronomeStartBtn.addEventListener('click', function() {
 
 metronomeStopBtn.addEventListener('click', stopMetronome);
 
-// Event listeners dos novos botões
 pauseExerciseBtn.addEventListener('click', pauseTimer);
 resumeExerciseBtn.addEventListener('click', resumeTimer);
 restartExerciseBtn.addEventListener('click', restartExercise);
@@ -189,14 +187,11 @@ backToHomeBtn1.addEventListener('click', backToHome);
 backToHomeBtn2.addEventListener('click', backToHome);
 backToHomeBtn3.addEventListener('click', backToHome);
 
-// Funções da Web Audio API
 function initAudio() {
     if (isAudioInitialized) return;
     
-    // Cria o contexto de áudio
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
     
-    // Carrega os sons do metrônomo
     loadSound('./assets/audios/metronome-sound-up.mp3', function(buffer) {
         metronomeSoundBuffer = buffer;
     });
@@ -207,7 +202,6 @@ function initAudio() {
     
     isAudioInitialized = true;
     
-    // Resumo o contexto se estiver suspenso (necessário em alguns browsers)
     if (audioContext.state === 'suspended') {
         audioContext.resume();
     }
@@ -245,7 +239,6 @@ function selectTraining(trainingType) {
     currentTraining = trainingData[trainingType];
     trainingTitle.textContent = currentTraining.name;
     
-    // Preencher lista de exercícios
     exerciseList.innerHTML = '';
     currentTraining.exercises.forEach((exercise, index) => {
         const exerciseItem = document.createElement('div');
@@ -257,7 +250,6 @@ function selectTraining(trainingType) {
         exerciseList.appendChild(exerciseItem);
     });
     
-    // Mostrar tela de lista de exercícios
     homeScreen.classList.add('hidden');
     exerciseListScreen.classList.remove('hidden');
 }
@@ -274,7 +266,6 @@ function showExercise() {
     exerciseDescription.textContent = exercise.description;
     exerciseDuration.textContent = formatTime(exercise.duration);
     
-    // Resetar elementos
     timerElement.textContent = formatTime(exercise.duration);
     exerciseProgress.style.width = '0%';
     countdownElement.classList.add('hidden');
@@ -284,12 +275,10 @@ function showExercise() {
     resumeExerciseBtn.classList.add('hidden');
     restartExerciseBtn.classList.remove('hidden');
     
-    // Resetar estado do timer
     isTimerPaused = false;
     timeLeft = exercise.duration;
     totalDuration = exercise.duration;
 
-    // Mostrar controles do metrônomo baseado na propriedade useMetronome
     if (exercise.useMetronome) {
         metronomeControls.classList.remove('hidden');
         stopMetronome();
@@ -512,3 +501,17 @@ function restartExercise() {
     pauseExerciseBtn.classList.add('hidden');
     resumeExerciseBtn.classList.add('hidden');
 }   
+
+function saveProgress() {
+    const progress = {
+        lastTraining: currentTraining,
+        lastExercise: currentExerciseIndex,
+        completedDates: getCompletedDates()
+    };
+    localStorage.setItem('whaleProgress', JSON.stringify(progress));
+}
+
+function loadProgress() {
+    const saved = localStorage.getItem('whaleProgress');
+    return saved ? JSON.parse(saved) : null;
+}
