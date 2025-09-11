@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Whale</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-
+        <!-- Tela inicial -->
         <div id="home-screen" class="screen">
             <h1>Whale</h1>
             <p>Selecione o treino que deseja realizar:</p>
@@ -27,24 +27,68 @@
                 <h2>Treino C</h2>
                 <p>Improvisação e Técnica - 30 minutos</p>
             </div>
+            
+            <div class="training-option" id="custom-training-option">
+                <h2>Treinos Personalizados</h2>
+                <p>Crie e gerencie seus próprios treinos</p>
+            </div>
         </div>
-        
 
+        <!-- Tela de treinos personalizados -->
+        <div id="custom-training-screen" class="screen hidden">
+            <h1>Treinos Personalizados</h1>
+            
+            <div id="custom-training-list" class="custom-training-list">
+                <!-- Os treinos personalizados serão carregados aqui -->
+            </div>
+            
+            <div class="buttons-container">
+                <button id="back-to-home-from-custom" class="btn btn-back">Voltar</button>
+                <button id="create-new-training" class="btn btn-custom">Criar Novo Treino</button>
+            </div>
+        </div>
+
+        <!-- Tela de criação/edição de treino -->
+        <div id="edit-training-screen" class="screen hidden">
+            <h1 id="edit-training-title">Criar Novo Treino</h1>
+            
+            <div class="form-group">
+                <label for="training-name">Nome do Treino:</label>
+                <input type="text" id="training-name" placeholder="Ex: Meu Treino de Velocidade">
+            </div>
+            
+            <div class="form-group">
+                <label for="training-description">Descrição:</label>
+                <textarea id="training-description" placeholder="Descreva o objetivo deste treino"></textarea>
+            </div>
+            
+            <h3>Exercícios</h3>
+            <div id="exercise-editor-list">
+                <!-- Exercícios serão adicionados aqui -->
+            </div>
+            
+            <button id="add-exercise-btn" class="btn">+ Adicionar Exercício</button>
+            
+            <div class="buttons-container">
+                <button id="cancel-edit-training" class="btn btn-back">Cancelar</button>
+                <button id="save-training" class="btn btn-start">Salvar Treino</button>
+            </div>
+        </div>
+
+        <!-- Tela de lista de exercícios -->
         <div id="exercise-list-screen" class="screen hidden">
             <h1 id="training-title">Treino A</h1>
             <p>Este treino contém os seguintes exercícios:</p>
             
-            <div id="exercise-list" class="exercise-list">
-
-            </div>
+            <div id="exercise-list" class="exercise-list"></div>
             
             <div class="buttons-container">
-            <button id="back-to-home-btn-1" class="btn btn-back">Voltar</button>
-            <button id="start-training-btn" class="btn">Iniciar Treino</button>
-</div>
+                <button id="back-to-home-btn-1" class="btn btn-back">Voltar</button>
+                <button id="start-training-btn" class="btn">Iniciar Treino</button>
+            </div>
         </div>
-        
 
+        <!-- Tela de exercício -->
         <div id="exercise-screen" class="screen hidden">
             <h1 id="current-exercise-name">Nome do Exercício</h1>
             
@@ -71,36 +115,29 @@
             </div>
 
             <div class="metronome-controls hidden">
-
-            <h3>Metrônomo</h3>
-            <div class="metronome-settings">
-
-                <label>
-                    BPM:
-                    <input type="number" id="metronome-bpm" min="40" max="240" value="120">
-                </label>
-
-                <label>
-                    Compasso:
-                    <select id="metronome-time-signature">
-                        <option value="4">4/4</option>
-                        <option value="3">3/4</option>
-                        <option value="6">6/8</option>
-                    </select>
-                </label>
-
+                <h3>Metrônomo</h3>
+                <div class="metronome-settings">
+                    <label>
+                        BPM:
+                        <input type="number" id="metronome-bpm" min="40" max="240" value="120">
+                    </label>
+                    <label>
+                        Compasso:
+                        <select id="metronome-time-signature">
+                            <option value="4">4/4</option>
+                            <option value="3">3/4</option>
+                            <option value="6">6/8</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="metronome-buttons">
+                    <button id="metronome-start" class="btn btn-metronome">Iniciar Metrônomo</button>
+                    <button id="metronome-stop" class="btn btn-metronome hidden">Parar Metrônomo</button>
+                </div>
             </div>
-
-            <div class="metronome-buttons">
-                <button id="metronome-start" class="btn btn-metronome">Iniciar Metrônomo</button>
-                <button id="metronome-stop" class="btn btn-metronome hidden">Parar Metrônomo</button>
-            </div>
-
         </div>
 
-        </div>
-        
-
+        <!-- Tela de conclusão -->
         <div id="finish-screen" class="screen hidden">
             <h1>Treino Concluído!</h1>
             <p>Parabéns por completar seu treino de guitarra!</p>
@@ -108,8 +145,8 @@
         </div>
     </div>
 
-    <audio id="sound-alarm" src="./assets/audios/alert-sound.mp3" preload="auto"></audio>
+    <audio id="sound-alarm" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
 
-    <script src="./script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -15,11 +15,11 @@ body {
 }
 
 .container {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     width: 90%;
-    max-width: 500px;
+    max-width: 600px;
     padding: 30px;
     text-align: center;
 }
@@ -34,6 +34,12 @@ h2 {
     color: #444;
     margin: 15px 0;
     font-size: 1.8rem;
+}
+
+h3 {
+    color: #555;
+    margin: 15px 0;
+    font-size: 1.4rem;
 }
 
 p {
@@ -81,6 +87,14 @@ p {
     background-color: #c0392b;
 }
 
+.btn-custom {
+    background-color: #9b59b6;
+}
+
+.btn-custom:hover {
+    background-color: #8e44ad;
+}
+
 .training-option {
     display: block;
     width: 100%;
@@ -126,6 +140,19 @@ p {
 .exercise-item {
     padding: 10px;
     border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.exercise-item-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.exercise-item-controls button {
+    padding: 5px 10px;
+    font-size: 0.9rem;
 }
 
 .metronome-controls {
@@ -255,6 +282,67 @@ p {
     background-color: #757575;
 }
 
+/* Formulários */
+.form-group {
+    margin: 15px 0;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.custom-training-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 20px 0;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.custom-training-item {
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.custom-training-item:hover {
+    background-color: #e9ecef;
+}
+
+.custom-training-item h4 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.custom-training-item p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
 /* Responsividade */
 @media (max-width: 480px) {
     .buttons-container {
@@ -264,5 +352,14 @@ p {
     .btn {
         width: 100%;
         margin: 5px 0;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    .metronome-settings {
+        flex-direction: column;
+        align-items: center;
     }
 }

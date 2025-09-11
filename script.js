@@ -1,20 +1,58 @@
-const pauseExerciseBtn = document.getElementById('pause-exercise-btn');
-const resumeExerciseBtn = document.getElementById('resume-exercise-btn');
-const restartExerciseBtn = document.getElementById('restart-exercise-btn');
-const backToHomeBtn1 = document.getElementById('back-to-home-btn-1');
-const backToHomeBtn2 = document.getElementById('back-to-home-btn-2');
-const backToHomeBtn3 = document.getElementById('back-to-home-btn-3');
+// Elementos da interface
+const homeScreen = document.getElementById('home-screen');
+const customTrainingScreen = document.getElementById('custom-training-screen');
+const editTrainingScreen = document.getElementById('edit-training-screen');
+const exerciseListScreen = document.getElementById('exercise-list-screen');
+const exerciseScreen = document.getElementById('exercise-screen');
+const finishScreen = document.getElementById('finish-screen');
 
+const customTrainingOption = document.getElementById('custom-training-option');
+const customTrainingList = document.getElementById('custom-training-list');
+const createNewTrainingBtn = document.getElementById('create-new-training');
+const backToHomeFromCustomBtn = document.getElementById('back-to-home-from-custom');
+const cancelEditTrainingBtn = document.getElementById('cancel-edit-training');
+const saveTrainingBtn = document.getElementById('save-training');
+const addExerciseBtn = document.getElementById('add-exercise-btn');
+const exerciseEditorList = document.getElementById('exercise-editor-list');
+const trainingNameInput = document.getElementById('training-name');
+const trainingDescriptionInput = document.getElementById('training-description');
+const editTrainingTitle = document.getElementById('edit-training-title');
+
+// Elementos do temporizador e metrônomo
+const timerElement = document.getElementById('timer');
+const countdownElement = document.getElementById('countdown');
+const soundAlarm = document.getElementById('sound-alarm');
+const metronomeBpmInput = document.getElementById('metronome-bpm');
+const metronomeTimeSignatureSelect = document.getElementById('metronome-time-signature');
+const metronomeStartBtn = document.getElementById('metronome-start');
+const metronomeStopBtn = document.getElementById('metronome-stop');
+const beatIndicator = document.createElement('div');
+beatIndicator.className = 'metronome-beat-indicator';
+const metronomeControls = document.querySelector('.metronome-controls');
+metronomeControls.appendChild(beatIndicator);
+
+// Dados de treinos personalizados
+let customTrainings = JSON.parse(localStorage.getItem('whaleCustomTrainings')) || {};
+let currentTrainingId = null;
+let isEditing = false;
+
+// Variáveis do temporizador e metrônomo
 let isTimerPaused = false;
 let timeLeft = 0;
 let totalDuration = 0;
-
-// Variáveis da Web Audio API
 let audioContext;
 let metronomeSoundBuffer;
 let metronomeFirstBeatSoundBuffer;
 let isAudioInitialized = false;
+let currentTraining = null;
+let currentExerciseIndex = 0;
+let timerInterval = null;
+let countdownInterval = null;
+let metronomeInterval = null;
+let currentBeat = 0;
+let isMetronomeActive = false;
 
+// Dados dos treinos padrão
 const trainingData = {
     A: {
         name: "Treino A - Escalas e Arpejos",
@@ -117,128 +155,260 @@ const trainingData = {
     }
 };
 
-const homeScreen = document.getElementById('home-screen');
-const exerciseListScreen = document.getElementById('exercise-list-screen');
-const exerciseScreen = document.getElementById('exercise-screen');
-const finishScreen = document.getElementById('finish-screen');
-
-const trainingTitle = document.getElementById('training-title');
-const exerciseList = document.getElementById('exercise-list');
-const startTrainingBtn = document.getElementById('start-training-btn');
-
-const currentExerciseName = document.getElementById('current-exercise-name');
-const exerciseDescription = document.getElementById('exercise-description');
-const exerciseDuration = document.getElementById('exercise-duration');
-const exerciseProgress = document.getElementById('exercise-progress');
-const countdownElement = document.getElementById('countdown');
-const timerElement = document.getElementById('timer');
-const startExerciseBtn = document.getElementById('start-exercise-btn');
-const nextExerciseBtn = document.getElementById('next-exercise-btn');
-
-const soundAlarm = document.getElementById('sound-alarm');
-const trainingOptions = document.querySelectorAll('.training-option');
-
-let currentTraining = null;
-let currentExerciseIndex = 0;
-let timerInterval = null;
-let countdownInterval = null;
-
-// Elementos do metrônomo
-const metronomeControls = document.querySelector('.metronome-controls');
-const metronomeBpmInput = document.getElementById('metronome-bpm');
-const metronomeTimeSignatureSelect = document.getElementById('metronome-time-signature');
-const metronomeStartBtn = document.getElementById('metronome-start');
-const metronomeStopBtn = document.getElementById('metronome-stop');
-const beatIndicator = document.createElement('div');
-beatIndicator.className = 'metronome-beat-indicator';
-
-metronomeControls.appendChild(beatIndicator);
-
-// Variáveis do metrônomo
-let metronomeInterval = null;
-let currentBeat = 0;
-let isMetronomeActive = false;
-
-// Event Listeners
-trainingOptions.forEach(option => {
-    option.addEventListener('click', () => {
-        const trainingType = option.getAttribute('data-training');
-        selectTraining(trainingType);
+// Inicialização da aplicação
+document.addEventListener('DOMContentLoaded', function() {
+    // Adicionar event listeners aos treinos padrão
+    document.querySelectorAll('.training-option[data-training]').forEach(option => {
+        option.addEventListener('click', () => {
+            const trainingType = option.getAttribute('data-training');
+            selectTraining(trainingType);
+        });
     });
+    
+    // Event listeners para treinos personalizados
+    customTrainingOption.addEventListener('click', showCustomTrainingScreen);
+    createNewTrainingBtn.addEventListener('click', createNewTraining);
+    backToHomeFromCustomBtn.addEventListener('click', backToHome);
+    cancelEditTrainingBtn.addEventListener('click', cancelEditTraining);
+    saveTrainingBtn.addEventListener('click', saveTraining);
+    addExerciseBtn.addEventListener('click', addExerciseToEditor);
+    
+    // Outros event listeners existentes
+    startTrainingBtn.addEventListener('click', startTraining);
+    startExerciseBtn.addEventListener('click', startExercise);
+    nextExerciseBtn.addEventListener('click', nextExercise);
+    
+    // Event listeners do metrônomo
+    metronomeStartBtn.addEventListener('click', startMetronome);
+    metronomeStopBtn.addEventListener('click', stopMetronome);
+    
+    // Event listeners dos botões de controle
+    pauseExerciseBtn.addEventListener('click', pauseTimer);
+    resumeExerciseBtn.addEventListener('click', resumeTimer);
+    restartExerciseBtn.addEventListener('click', restartExercise);
+    
+    backToHomeBtn1.addEventListener('click', backToHome);
+    backToHomeBtn2.addEventListener('click', backToHome);
+    backToHomeBtn3.addEventListener('click', backToHome);
 });
 
-startTrainingBtn.addEventListener('click', startTraining);
-startExerciseBtn.addEventListener('click', startExercise);
-nextExerciseBtn.addEventListener('click', nextExercise);
+// Funções para gerenciar treinos personalizados
+function showCustomTrainingScreen() {
+    homeScreen.classList.add('hidden');
+    customTrainingScreen.classList.remove('hidden');
+    loadCustomTrainingList();
+}
 
-// Event listeners do metrônomo
-metronomeStartBtn.addEventListener('click', function() {
-    initAudio();
-    startMetronome();
-});
-
-metronomeStopBtn.addEventListener('click', stopMetronome);
-
-pauseExerciseBtn.addEventListener('click', pauseTimer);
-resumeExerciseBtn.addEventListener('click', resumeTimer);
-restartExerciseBtn.addEventListener('click', restartExercise);
-
-backToHomeBtn1.addEventListener('click', backToHome);
-backToHomeBtn2.addEventListener('click', backToHome);
-backToHomeBtn3.addEventListener('click', backToHome);
-
-function initAudio() {
-    if (isAudioInitialized) return;
+function loadCustomTrainingList() {
+    customTrainingList.innerHTML = '';
     
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (Object.keys(customTrainings).length === 0) {
+        customTrainingList.innerHTML = '<p>Nenhum treino personalizado criado ainda.</p>';
+        return;
+    }
     
-    loadSound('./assets/audios/metronome-sound-up.mp3', function(buffer) {
-        metronomeSoundBuffer = buffer;
-    });
-    
-    loadSound('./assets/audios/metronome-sound-down.mp3', function(buffer) {
-        metronomeFirstBeatSoundBuffer = buffer;
-    });
-    
-    isAudioInitialized = true;
-    
-    if (audioContext.state === 'suspended') {
-        audioContext.resume();
+    for (const id in customTrainings) {
+        const training = customTrainings[id];
+        const trainingItem = document.createElement('div');
+        trainingItem.className = 'custom-training-item';
+        trainingItem.innerHTML = `
+            <h4>${training.name}</h4>
+            <p>${training.exercises.length} exercícios · ${calculateTotalTime(training.exercises)}</p>
+            <p><small>${training.description || 'Sem descrição'}</small></p>
+        `;
+        
+        trainingItem.addEventListener('click', () => {
+            selectTraining('CUSTOM', id);
+        });
+        
+        // Adicionar botões de editar e excluir
+        const controlsDiv = document.createElement('div');
+        controlsDiv.className = 'exercise-item-controls';
+        
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn';
+        editBtn.textContent = 'Editar';
+        editBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            editTraining(id);
+        });
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-finish';
+        deleteBtn.textContent = 'Excluir';
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteTraining(id);
+        });
+        
+        controlsDiv.appendChild(editBtn);
+        controlsDiv.appendChild(deleteBtn);
+        trainingItem.appendChild(controlsDiv);
+        
+        customTrainingList.appendChild(trainingItem);
     }
 }
 
-function loadSound(url, callback) {
-    const request = new XMLHttpRequest();
-    request.open('GET', url, true);
-    request.responseType = 'arraybuffer';
-    
-    request.onload = function() {
-        audioContext.decodeAudioData(request.response, callback, function(err) {
-            console.error('Erro ao decodificar áudio:', err);
-        });
-    };
-    
-    request.onerror = function() {
-        console.error('Erro ao carregar áudio:', url);
-    };
-    
-    request.send();
+function calculateTotalTime(exercises) {
+    const totalSeconds = exercises.reduce((total, exercise) => total + exercise.duration, 0);
+    const minutes = Math.floor(totalSeconds / 60);
+    return `${minutes} minuto${minutes !== 1 ? 's' : ''}`;
 }
 
-function playSound(buffer) {
-    if (!audioContext || !buffer) return;
+function createNewTraining() {
+    isEditing = false;
+    currentTrainingId = null;
+    trainingNameInput.value = '';
+    trainingDescriptionInput.value = '';
+    exerciseEditorList.innerHTML = '';
+    editTrainingTitle.textContent = 'Criar Novo Treino';
     
-    const source = audioContext.createBufferSource();
-    source.buffer = buffer;
-    source.connect(audioContext.destination);
-    source.start(0);
+    // Adicionar um exercício vazio por padrão
+    addExerciseToEditor();
+    
+    customTrainingScreen.classList.add('hidden');
+    editTrainingScreen.classList.remove('hidden');
 }
 
-// Funções
-function selectTraining(trainingType) {
-    currentTraining = trainingData[trainingType];
+function editTraining(id) {
+    isEditing = true;
+    currentTrainingId = id;
+    const training = customTrainings[id];
+    
+    trainingNameInput.value = training.name;
+    trainingDescriptionInput.value = training.description || '';
+    editTrainingTitle.textContent = 'Editar Treino';
+    
+    // Limpar e preencher a lista de exercícios
+    exerciseEditorList.innerHTML = '';
+    
+    training.exercises.forEach((exercise, index) => {
+        addExerciseToEditor(exercise, index);
+    });
+    
+    customTrainingScreen.classList.add('hidden');
+    editTrainingScreen.classList.remove('hidden');
+}
+
+function addExerciseToEditor(exercise = null, index = null) {
+    const exerciseId = index !== null ? index : exerciseEditorList.children.length;
+    
+    const exerciseDiv = document.createElement('div');
+    exerciseDiv.className = 'exercise-editor-item';
+    exerciseDiv.innerHTML = `
+        <div class="form-group">
+            <label>Nome do Exercício:</label>
+            <input type="text" class="exercise-name" value="${exercise ? exercise.name : ''}" placeholder="Nome do exercício">
+        </div>
+        <div class="form-group">
+            <label>Descrição:</label>
+            <textarea class="exercise-description" placeholder="Descrição do exercício">${exercise ? exercise.description : ''}</textarea>
+        </div>
+        <div class="form-group">
+            <label>Duração (segundos):</label>
+            <input type="number" class="exercise-duration" value="${exercise ? exercise.duration : 60}" min="10">
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" class="exercise-metronome" ${exercise && exercise.useMetronome ? 'checked' : 'checked'}>
+                Usar metrônomo
+            </label>
+        </div>
+        <button class="btn btn-finish remove-exercise">Remover</button>
+        <hr>
+    `;
+    
+    exerciseDiv.querySelector('.remove-exercise').addEventListener('click', () => {
+        exerciseDiv.remove();
+    });
+    
+    exerciseEditorList.appendChild(exerciseDiv);
+}
+
+function saveTraining() {
+    const name = trainingNameInput.value.trim();
+    const description = trainingDescriptionInput.value.trim();
+    
+    if (!name) {
+        alert('Por favor, informe um nome para o treino.');
+        return;
+    }
+    
+    // Coletar exercícios
+    const exercises = [];
+    const exerciseItems = exerciseEditorList.querySelectorAll('.exercise-editor-item');
+    
+    if (exerciseItems.length === 0) {
+        alert('Adicione pelo menos um exercício ao treino.');
+        return;
+    }
+    
+    exerciseItems.forEach(item => {
+        const exerciseName = item.querySelector('.exercise-name').value.trim();
+        const exerciseDescription = item.querySelector('.exercise-description').value.trim();
+        const exerciseDuration = parseInt(item.querySelector('.exercise-duration').value) || 60;
+        const useMetronome = item.querySelector('.exercise-metronome').checked;
+        
+        if (exerciseName) {
+            exercises.push({
+                name: exerciseName,
+                description: exerciseDescription,
+                duration: exerciseDuration,
+                useMetronome: useMetronome
+            });
+        }
+    });
+    
+    if (exercises.length === 0) {
+        alert('Adicione pelo menos um exercício válido ao treino.');
+        return;
+    }
+    
+    // Criar ou atualizar o treino
+    const trainingId = currentTrainingId || Date.now().toString();
+    
+    customTrainings[trainingId] = {
+        name: name,
+        description: description,
+        exercises: exercises
+    };
+    
+    // Salvar no localStorage
+    localStorage.setItem('whaleCustomTrainings', JSON.stringify(customTrainings));
+    
+    // Voltar para a lista de treinos personalizados
+    editTrainingScreen.classList.add('hidden');
+    customTrainingScreen.classList.remove('hidden');
+    
+    // Recarregar a lista
+    loadCustomTrainingList();
+}
+
+function deleteTraining(id) {
+    if (confirm('Tem certeza que deseja excluir este treino?')) {
+        delete customTrainings[id];
+        localStorage.setItem('whaleCustomTrainings', JSON.stringify(customTrainings));
+        loadCustomTrainingList();
+    }
+}
+
+function cancelEditTraining() {
+    editTrainingScreen.classList.add('hidden');
+    customTrainingScreen.classList.remove('hidden');
+}
+
+// Modificar a função selectTraining para suportar treinos personalizados
+function selectTraining(trainingType, customId = null) {
+    if (trainingType === 'CUSTOM') {
+        currentTraining = customTrainings[customId];
+        currentTraining.customId = customId; // Guardar o ID para possível edição futura
+    } else {
+        currentTraining = trainingData[trainingType];
+    }
+    
     trainingTitle.textContent = currentTraining.name;
     
+    // Preencher lista de exercícios
     exerciseList.innerHTML = '';
     currentTraining.exercises.forEach((exercise, index) => {
         const exerciseItem = document.createElement('div');
@@ -250,10 +420,16 @@ function selectTraining(trainingType) {
         exerciseList.appendChild(exerciseItem);
     });
     
-    homeScreen.classList.add('hidden');
+    // Mostrar tela de lista de exercícios
+    if (trainingType === 'CUSTOM') {
+        customTrainingScreen.classList.add('hidden');
+    } else {
+        homeScreen.classList.add('hidden');
+    }
     exerciseListScreen.classList.remove('hidden');
 }
 
+// Funções do temporizador e exercícios
 function startTraining() {
     currentExerciseIndex = 0;
     showExercise();
@@ -266,6 +442,7 @@ function showExercise() {
     exerciseDescription.textContent = exercise.description;
     exerciseDuration.textContent = formatTime(exercise.duration);
     
+    // Resetar elementos
     timerElement.textContent = formatTime(exercise.duration);
     exerciseProgress.style.width = '0%';
     countdownElement.classList.add('hidden');
@@ -275,10 +452,12 @@ function showExercise() {
     resumeExerciseBtn.classList.add('hidden');
     restartExerciseBtn.classList.remove('hidden');
     
+    // Resetar estado do timer
     isTimerPaused = false;
     timeLeft = exercise.duration;
     totalDuration = exercise.duration;
 
+    // Mostrar controles do metrônomo baseado na propriedade useMetronome
     if (exercise.useMetronome) {
         metronomeControls.classList.remove('hidden');
         stopMetronome();
@@ -367,6 +546,8 @@ function backToHome() {
     stopMetronome();
     
     // Esconder todas as telas exceto a inicial
+    customTrainingScreen.classList.add('hidden');
+    editTrainingScreen.classList.add('hidden');
     exerciseListScreen.classList.add('hidden');
     exerciseScreen.classList.add('hidden');
     finishScreen.classList.add('hidden');
@@ -378,36 +559,7 @@ function backToHome() {
     isTimerPaused = false;
 }
 
-function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-}
-
 // Funções do metrônomo
-function createBeatIndicator(beats) {
-    beatIndicator.innerHTML = '';
-    for (let i = 0; i < beats; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'beat-dot';
-        dot.textContent = i + 1;
-        
-        beatIndicator.appendChild(dot);
-    }
-}
-
-function updateBeatIndicator(beat) {
-    const dots = beatIndicator.querySelectorAll('.beat-dot');
-    dots.forEach((dot, index) => {
-
-        dot.classList.remove('active');
-        
-        if (index === beat) {
-            dot.classList.add('active');
-        }
-    });
-}
-
 function startMetronome() {
     if (isMetronomeActive) return;
     
@@ -421,9 +573,11 @@ function startMetronome() {
     createBeatIndicator(timeSignature);
     updateBeatIndicator(currentBeat);
     
-    // Tocar a primeira batida (som diferente) usando Web Audio API
-    if (metronomeFirstBeatSoundBuffer) {
-        playSound(metronomeFirstBeatSoundBuffer);
+    // Tocar a primeira batida (som diferente)
+    try {
+        soundAlarm.play();
+    } catch (e) {
+        console.log("Simulando som do metrônomo");
     }
     
     metronomeInterval = setInterval(() => {
@@ -432,12 +586,17 @@ function startMetronome() {
         
         // Tocar som diferente para a primeira batida do compasso
         if (currentBeat === 0) {
-            if (metronomeFirstBeatSoundBuffer) {
-                playSound(metronomeFirstBeatSoundBuffer);
+            try {
+                soundAlarm.play();
+            } catch (e) {
+                console.log("Simulando som de batida forte");
             }
         } else {
-            if (metronomeSoundBuffer) {
-                playSound(metronomeSoundBuffer);
+            try {
+                // Usar um som diferente se disponível
+                soundAlarm.play();
+            } catch (e) {
+                console.log("Simulando som de batida normal");
             }
         }
     }, interval);
@@ -461,6 +620,28 @@ function stopMetronome() {
         dot.classList.remove('active');
         if (index === 0) {
             dot.classList.add('strong');
+        }
+    });
+}
+
+function createBeatIndicator(beats) {
+    beatIndicator.innerHTML = '';
+    for (let i = 0; i < beats; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'beat-dot' + (i === 0 ? ' strong' : '');
+        dot.textContent = i + 1;
+        
+        beatIndicator.appendChild(dot);
+    }
+}
+
+function updateBeatIndicator(beat) {
+    const dots = beatIndicator.querySelectorAll('.beat-dot');
+    dots.forEach((dot, index) => {
+        dot.classList.remove('active');
+        
+        if (index === beat) {
+            dot.classList.add('active');
         }
     });
 }
@@ -500,18 +681,11 @@ function restartExercise() {
     nextExerciseBtn.classList.add('hidden');
     pauseExerciseBtn.classList.add('hidden');
     resumeExerciseBtn.classList.add('hidden');
-}   
-
-function saveProgress() {
-    const progress = {
-        lastTraining: currentTraining,
-        lastExercise: currentExerciseIndex,
-        completedDates: getCompletedDates()
-    };
-    localStorage.setItem('whaleProgress', JSON.stringify(progress));
 }
 
-function loadProgress() {
-    const saved = localStorage.getItem('whaleProgress');
-    return saved ? JSON.parse(saved) : null;
+// Funções auxiliares
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
